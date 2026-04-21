@@ -1,0 +1,298 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 215 30% 18%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 30% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 30% 18%;
+
+    --primary: 187 85% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 175 70% 55%;
+
+    --secondary: 210 40% 94%;
+    --secondary-foreground: 215 30% 18%;
+
+    --muted: 210 30% 95%;
+    --muted-foreground: 215 15% 45%;
+
+    --accent: 175 65% 92%;
+    --accent-foreground: 187 85% 25%;
+
+    --destructive: 358 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 95% 55%;
+    --warning-foreground: 30 50% 15%;
+
+    --success: 145 60% 42%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 210 25% 90%;
+    --input: 210 25% 92%;
+    --ring: 187 85% 40%;
+
+    --radius: 1.25rem;
+
+    /* Claymorphism shadows */
+    --shadow-clay: 12px 12px 24px hsl(210 30% 85% / 0.6), -8px -8px 20px hsl(0 0% 100% / 0.9);
+    --shadow-clay-sm: 6px 6px 14px hsl(210 30% 85% / 0.5), -4px -4px 10px hsl(0 0% 100% / 0.85);
+    --shadow-clay-inset: inset 4px 4px 10px hsl(210 30% 85% / 0.4), inset -4px -4px 10px hsl(0 0% 100% / 0.9);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.25);
+    --shadow-panel: 22px 22px 60px hsl(200 35% 82% / 0.22), -18px -18px 40px hsl(0 0% 100% / 0.92);
+
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-soft: linear-gradient(145deg, hsl(210 40% 98%), hsl(187 48% 95%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 97%));
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 25% 30%;
+    --sidebar-primary: 187 85% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 175 65% 94%;
+    --sidebar-accent-foreground: 187 85% 25%;
+    --sidebar-border: 210 25% 92%;
+    --sidebar-ring: 187 85% 40%;
+  }
+
+  .dark {
+    --background: 215 35% 9%;
+    --foreground: 210 30% 95%;
+
+    --card: 215 30% 13%;
+    --card-foreground: 210 30% 95%;
+
+    --popover: 215 30% 13%;
+    --popover-foreground: 210 30% 95%;
+
+    --primary: 175 75% 55%;
+    --primary-foreground: 215 35% 9%;
+    --primary-glow: 187 85% 60%;
+
+    --secondary: 215 25% 18%;
+    --secondary-foreground: 210 30% 95%;
+
+    --muted: 215 25% 16%;
+    --muted-foreground: 210 18% 74%;
+
+    --accent: 187 50% 20%;
+    --accent-foreground: 175 75% 80%;
+
+    --destructive: 358 70% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 95% 60%;
+    --warning-foreground: 30 50% 15%;
+
+    --success: 145 55% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 215 25% 20%;
+    --input: 215 25% 18%;
+    --ring: 175 75% 55%;
+
+    --shadow-clay: 12px 12px 24px hsl(215 40% 5% / 0.6), -6px -6px 16px hsl(215 25% 18% / 0.5);
+    --shadow-clay-sm: 6px 6px 14px hsl(215 40% 5% / 0.5), -3px -3px 8px hsl(215 25% 18% / 0.4);
+    --shadow-clay-inset: inset 4px 4px 10px hsl(215 40% 5% / 0.5), inset -4px -4px 10px hsl(215 25% 18% / 0.4);
+    --shadow-glow: 0 0 40px hsl(var(--primary) / 0.35);
+    --shadow-panel: 24px 24px 60px hsl(220 40% 4% / 0.3), -16px -16px 32px hsl(215 25% 14% / 0.45);
+
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-soft: linear-gradient(135deg, hsl(215 35% 9%), hsl(215 30% 13%));
+    --gradient-card: linear-gradient(145deg, hsl(215 30% 14%), hsl(215 30% 12%));
+
+    --sidebar-background: 215 32% 11%;
+    --sidebar-foreground: 210 20% 80%;
+    --sidebar-primary: 175 75% 55%;
+    --sidebar-primary-foreground: 215 35% 9%;
+    --sidebar-accent: 215 25% 16%;
+    --sidebar-accent-foreground: 175 75% 80%;
+    --sidebar-border: 215 25% 18%;
+    --sidebar-ring: 175 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image: radial-gradient(circle at top left, hsl(var(--primary) / 0.08), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--primary-glow) / 0.08), transparent 24%),
+      linear-gradient(180deg, hsl(var(--background)), hsl(210 35% 97%));
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image: radial-gradient(circle at top left, hsl(var(--primary) / 0.12), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--primary-glow) / 0.1), transparent 24%),
+      linear-gradient(180deg, hsl(215 35% 10%), hsl(220 28% 7%));
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .clay {
+    @apply bg-card rounded-3xl;
+    box-shadow: var(--shadow-clay);
+  }
+  .clay-sm {
+    @apply bg-card rounded-2xl;
+    box-shadow: var(--shadow-clay-sm);
+  }
+  .clay-inset {
+    @apply bg-muted/40 rounded-2xl;
+    box-shadow: var(--shadow-clay-inset);
+  }
+  .clay-primary {
+    background: var(--gradient-primary);
+    @apply rounded-3xl text-primary-foreground;
+    box-shadow: var(--shadow-clay), var(--shadow-glow);
+  }
+
+  .soft-surface {
+    box-shadow: var(--shadow-panel);
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grid-pattern {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.25) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.25) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+  }
+
+  .fade-up {
+    animation: fade-up 0.8s ease-out both;
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 5s ease-in-out infinite;
+  }
+
+  .float-slow {
+    animation: float-slow 7s ease-in-out infinite;
+  }
+
+  .float-delay {
+    animation: float-slow 8.5s ease-in-out infinite;
+    animation-delay: 1.2s;
+  }
+
+  .scan-sweep::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border-radius: 1.5rem;
+    background: linear-gradient(180deg, transparent 0%, hsl(var(--primary) / 0.22) 48%, transparent 100%);
+    animation: scan-sweep 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .medical-wave {
+    position: relative;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, hsl(var(--primary) / 0.1), hsl(var(--primary-glow) / 0.18));
+  }
+
+  .medical-wave::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 0%, transparent 10%, currentColor 10%, currentColor 12%, transparent 12%, transparent 28%, currentColor 28%, currentColor 30%, transparent 30%, transparent 42%, currentColor 42%, currentColor 44%, transparent 44%, transparent 58%, currentColor 58%, currentColor 64%, transparent 64%, transparent 100%);
+    clip-path: polygon(0 55%, 10% 55%, 14% 52%, 18% 60%, 24% 18%, 30% 82%, 38% 44%, 44% 54%, 55% 54%, 62% 55%, 68% 40%, 73% 62%, 78% 53%, 100% 53%, 100% 100%, 0 100%);
+    opacity: 0.9;
+    animation: wave-slide 4.4s linear infinite;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: var(--shadow-panel), 0 0 0 hsl(var(--primary) / 0);
+  }
+
+  50% {
+    box-shadow: var(--shadow-panel), 0 0 48px hsl(var(--primary) / 0.12);
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes scan-sweep {
+  0%,
+  100% {
+    transform: translateY(-75%);
+    opacity: 0;
+  }
+
+  18%,
+  82% {
+    opacity: 1;
+  }
+
+  50% {
+    transform: translateY(75%);
+    opacity: 0.85;
+  }
+}
+
+@keyframes wave-slide {
+  from {
+    transform: translateX(-18%);
+  }
+
+  to {
+    transform: translateX(18%);
+  }
+}
