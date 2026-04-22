@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ExternalLink, QrCode, Sparkles, UserRound } from "lucide-react";
 import jsQR from "jsqr";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,9 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
 import { apiFetch, toApiAssetUrl } from "@/lib/api";
 import { toast } from "@/components/ui/sonner";
+import { buildDoctorPatientRecord } from "@/lib/doctorPatientRecord";
+import { clearCachedPatientChart, readCachedPatientChart, saveCachedPatientChart } from "@/lib/offlineStore";
+import { useOnlineStatus } from "@/hooks/use-online-status";
 
 export default function DoctorScanPage() {
-  const { grantDoctorAccess, clearDoctorAccess } = useAuth();
+  const { doctorAccess, grantDoctorAccess, clearDoctorAccess } = useAuth();
+  const isOnline = useOnlineStatus();
   const [token, setToken] = useState("");
   const [message, setMessage] = useState("");
   const [cameraError, setCameraError] = useState("");
@@ -65,41 +70,10 @@ export default function DoctorScanPage() {
         apiFetch(`/doctors/patient/${patientId}/summary`)
       ]);
 
-      const formattedPatient = {
-        id: profile._id,
-        name: profile.userId?.name,
-        age: profile.age,
-        gender: profile.gender,
-        bloodGroup: profile.bloodGroup,
-        contact: profile.contactNumber,
-        email: profile.userId?.email,
-        address: profile.address,
-        majorHealthIssues: profile.majorIssues || [],
-        medicalHistory: historyRes.map((h: any) => ({
-           title: h.title,
-           type: h.type,
-           date: new Date(h.date).toLocaleDateString(),
-           summary: h.description || '',
-           reportFile: h.reportFile,
-           reportFileName: h.reportFileName || "report"
-        })),
-        prescriptions: presRes.flatMap((rx: any) => rx.medicines.map((m: any) => ({
-           medicine: m.name, dosage: m.dosage, duration: m.duration
-        }))),
-        reports: historyRes
-          .filter((h: any) => h.reportFile)
-          .map((h: any) => ({
-            title: h.title,
-            date: new Date(h.date).toLocaleDateString(),
-            url: toApiAssetUrl(h.reportFile),
-            fileName: h.reportFileName || "report"
-          })),
-        aiSummary: summaryRes.summary,
-        aiHighlights: summaryRes.highlights || [],
-        qrToken: profile.qrCode
-      };
+      const formattedPatient = buildDoctorPatientRecord(profile, historyRes, presRes, summaryRes);
 
       setScannedPatient(formattedPatient);
+      saveCachedPatientChart(formattedPatient);
       setSavedFor("");
       setTestSavedFor("");
       setDuplicateTestMatch(null);
@@ -108,6 +82,10 @@ export default function DoctorScanPage() {
 
   const handleScan = async (value: string) => {
     if (!value) return;
+    if (!isOnline) {
+      setMessage("You are offline. Open the cached patient chart if it was synced on this device earlier.");
+      return;
+    }
     try {
       const res: any = await apiFetch('/doctors/verify-patient', {
         method: 'POST',
@@ -129,6 +107,11 @@ export default function DoctorScanPage() {
   };
 
   const startCamera = async () => {
+    if (!isOnline) {
+      setMessage("You are offline. Camera verification needs the internet, but the cached chart can still be opened.");
+      return;
+    }
+
     setMessage("");
     setCameraError("");
     setCameraSupported(true);
@@ -230,6 +213,22 @@ export default function DoctorScanPage() {
   };
 
   useEffect(() => {
+    if (doctorAccess.patientId) {
+      const cachedChart = readCachedPatientChart(doctorAccess.patientId);
+
+      if (cachedChart) {
+        setScannedPatient(cachedChart.data);
+        setMessage((currentMessage) =>
+          currentMessage ||
+          (isOnline
+            ? `Last synced chart for ${cachedChart.data.name} is available below.`
+            : `Offline mode: showing the last synced chart for ${cachedChart.data.name}.`),
+        );
+      }
+    }
+  }, [doctorAccess.patientId, isOnline]);
+
+  useEffect(() => {
     return () => {
       stopCamera();
     };
@@ -327,6 +326,12 @@ export default function DoctorScanPage() {
       <section className="soft-surface rounded-[2rem] border border-white/60 bg-white/85 p-7 dark:border-white/12 dark:bg-slate-900/75">
         <p className="text-xs uppercase tracking-[0.28em] text-muted-foreground">Scan QR</p>
         <h1 className="mt-2 text-3xl font-semibold tracking-tight">Scan a patient QR for secure access</h1>
+
+        {!isOnline && (
+          <div className="mt-6 rounded-[1.5rem] border border-amber-500/20 bg-amber-500/5 p-4 text-sm text-foreground">
+            QR verification needs the internet, but any previously synced patient chart on this device can still be opened below.
+          </div>
+        )}
         
         <div className="mt-8 overflow-hidden rounded-[2rem] border border-white/70 bg-background/80 dark:border-white/10">
           <div className="grid gap-0 lg:grid-cols-[1.15fr_0.85fr]">
@@ -349,13 +354,22 @@ export default function DoctorScanPage() {
 
             <div className="flex flex-col justify-between p-6">
                <div className="space-y-4">
-                  <Button className="w-full rounded-2xl" onClick={cameraActive ? stopCamera : startCamera}>
+                  <Button className="w-full rounded-2xl" onClick={cameraActive ? stopCamera : startCamera} disabled={!cameraActive && !isOnline}>
                     {cameraActive ? "Stop Camera" : "Start Camera Scan"}
                   </Button>
+                  {doctorAccess.granted && (
+                    <Button asChild variant="secondary" className="w-full rounded-2xl">
+                      <Link to="/doctor/patient-view">Open Patient Chart</Link>
+                    </Button>
+                  )}
                   <Button 
                     variant="outline" 
                     className="w-full rounded-2xl" 
                     onClick={() => {
+                        const activePatientId = scannedPatient?.id || doctorAccess.patientId;
+                        if (activePatientId) {
+                          clearCachedPatientChart(activePatientId);
+                        }
                         clearDoctorAccess();
                         setScannedPatient(null);
                         setSavedFor("");
@@ -366,7 +380,7 @@ export default function DoctorScanPage() {
                   </Button>
                </div>
                <div className="mt-4 rounded-2xl bg-primary/5 p-4 text-xs leading-relaxed text-muted-foreground">
-                  The camera will detect the patient ID from the QR code and securely load their profile from the backend.
+                  The camera will detect the patient ID from the QR code and securely load their profile from the backend. Once opened, the patient chart is cached on this device for offline viewing.
                </div>
             </div>
           </div>
@@ -381,7 +395,7 @@ export default function DoctorScanPage() {
                 placeholder="Paste QR token" 
                 className="h-12 rounded-2xl bg-background/70"
               />
-              <Button onClick={() => handleScan(token)} className="h-12 rounded-2xl px-6">Verify</Button>
+              <Button onClick={() => handleScan(token)} className="h-12 rounded-2xl px-6" disabled={!isOnline}>Verify</Button>
            </div>
         </div>
 

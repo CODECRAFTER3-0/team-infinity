@@ -24,6 +24,7 @@ import DoctorPatientViewPage from "@/pages/DoctorPatientViewPage";
 import DoctorAddPrescriptionPage from "@/pages/DoctorAddPrescriptionPage";
 import DoctorProfilePage from "@/pages/DoctorProfilePage";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
+import AdminRoleActivityPage from "@/pages/AdminRoleActivityPage";
 import NotFound from "@/pages/NotFound";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -102,6 +103,8 @@ const App = () => {
             >
               <Route index element={<Navigate to="dashboard" replace />} />
               <Route path="dashboard" element={<AdminDashboardPage />} />
+              <Route path="doctor-activity" element={<AdminRoleActivityPage roleFilter="doctor" />} />
+              <Route path="patient-activity" element={<AdminRoleActivityPage roleFilter="patient" />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

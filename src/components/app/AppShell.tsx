@@ -1,10 +1,11 @@
-import { Activity, ClipboardList, FileText, LayoutDashboard, LogOut, Menu, Moon, QrCode, Shield, Sun, UserRound } from "lucide-react";
+import { Activity, ClipboardList, FileText, LayoutDashboard, LogOut, Menu, Moon, QrCode, Shield, Stethoscope, Sun, UserRound, Users } from "lucide-react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/site/ThemeProvider";
 import { useAuth } from "@/context/AuthContext";
+import { MedicalAssistantWidget } from "@/components/app/MedicalAssistantWidget";
 
 const roleNavigation = {
   patient: [
@@ -17,10 +18,13 @@ const roleNavigation = {
   doctor: [
     { to: "/doctor/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { to: "/doctor/scan", label: "Scan QR", icon: QrCode },
+    { to: "/doctor/patient-view", label: "Patient Chart", icon: FileText },
     { to: "/doctor/profile", label: "Profile", icon: UserRound },
   ],
   admin: [
-    { to: "/admin/dashboard", label: "Audit Logs", icon: Shield },
+    { to: "/admin/dashboard", label: "Dashboard", icon: Shield },
+    { to: "/admin/doctor-activity", label: "Doctor Activity", icon: Stethoscope },
+    { to: "/admin/patient-activity", label: "Patient Activity", icon: Users },
   ],
 } as const;
 
@@ -32,6 +36,7 @@ export function AppShell() {
   if (!session) return null;
 
   const items = roleNavigation[session.role];
+  const showMedicalAssistant = session.role === "patient" || session.role === "doctor";
 
   return (
     <div className="min-h-screen">
@@ -149,6 +154,7 @@ export function AppShell() {
           </main>
         </div>
       </div>
+      {showMedicalAssistant && <MedicalAssistantWidget role={session.role} />}
     </div>
   );
 }

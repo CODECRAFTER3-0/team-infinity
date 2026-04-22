@@ -16,7 +16,6 @@ const roleCards = [
 const signupLinks = [
   { to: "/signup/patient", title: "Patient signup", icon: UserRound, detail: "Register your medical profile and health details." },
   { to: "/signup/doctor", title: "Doctor signup", icon: Stethoscope, detail: "Add your licence and clinical credentials." },
-  { to: "/signup/admin", title: "Admin signup", icon: UserRoundCog, detail: "Create a governance account with department info." },
 ];
 
 export default function AuthPage() {
